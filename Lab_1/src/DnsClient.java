@@ -1,19 +1,36 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 public class DnsClient {
 
-	public static void main(String[] args) throws IOException {
-		// Open a reader to input from the command line
-		BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-		String sentence;
+	public static void main(String[] args) {
 		
-		// Read input from the user:
-		System.out.println("Type a message and hit enter.");
-		sentence = inFromUser.readLine();
+		System.out.println("Fuck");
+		// Create Options object
+		Options options = new Options();
 		
-		System.out.println(sentence);
+		
+		// add t option, false indicates optional
+		options.addOption("t", false, "timeout");
+		options.addOption("r", false, "max-retries");
+		options.addOption("p", false, "port");
+		options.addOption("mx", false, "Mail server");
+		options.addOption("ns", false, "Name server");
+		
+		
+		CommandLineParser parser = new DefaultParser();
+		try {
+			CommandLine cmd = parser.parse(options, args);
+			if (cmd.hasOption("t")) {
+				System.out.print("timeout");
+			}
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
