@@ -9,9 +9,11 @@ public class DnsClient {
 	public static void main(String[] args) {
 		
 		System.out.println("Fuck");
+		/**
+		 * Argument Parser
+		 */
 		// Create Options object
 		Options options = new Options();
-		
 		
 		// add t option, false indicates optional
 		options.addOption("t", false, "timeout");
@@ -31,6 +33,9 @@ public class DnsClient {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		Domain domain = new Domain().fromString("www.mcgill.ca");
+		System.out.println(domain.toString());
+		
 	}
-
 }
