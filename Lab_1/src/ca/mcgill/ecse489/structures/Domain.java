@@ -6,7 +6,7 @@ import java.util.Collection;
 
 
 /**
- * 
+ * A object for domain name, organized by size and labels
  * @author Yang Zhou(260401719)
  *
  */

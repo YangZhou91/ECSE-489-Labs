@@ -1,4 +1,6 @@
 package ca.mcgill.ecse489.structures;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
 import org.apache.commons.cli.CommandLine;
@@ -6,6 +8,9 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
+import ca.mcgill.ecse489.util.Util;
+
 
 
 public class DnsClient {
@@ -49,5 +54,12 @@ public class DnsClient {
 		System.out.println(buf);
 //		System.out.println(domain.toString());
 		
+		try {
+            InetAddress address = InetAddress.getByName("129.168.1.1");
+            Util.getIpAddressinByteArray(address);
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 	}
 }
