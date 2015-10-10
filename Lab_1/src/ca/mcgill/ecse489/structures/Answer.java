@@ -2,7 +2,13 @@ package ca.mcgill.ecse489.structures;
 import java.nio.ByteBuffer;
 
 import ca.mcgill.ecse489.packet.PacketCompoent;
+import ca.mcgill.ecse489.record.ARecord;
+import ca.mcgill.ecse489.record.CNameRecord;
+import ca.mcgill.ecse489.record.MXRecord;
+import ca.mcgill.ecse489.record.NSRecord;
 import ca.mcgill.ecse489.record.RData;
+import ca.mcgill.ecse489.type.Type;
+import ca.mcgill.ecse489.type.Class;
 
 /**
  * @author Yan Liu (260152375)
@@ -10,8 +16,8 @@ import ca.mcgill.ecse489.record.RData;
  */
 public class Answer implements PacketCompoent<Answer> {
 	private Domain domain;
-	private Atype answerType;
-	private short answerClass;
+	private Type answerType;
+	private Class answerClass;
 	private int ttl;
 	private short rdLength;
 	// any type
@@ -31,25 +37,25 @@ public class Answer implements PacketCompoent<Answer> {
 
 
 
-    public Atype getAnswerType() {
+    public Type getAnswerType() {
         return answerType;
     }
 
 
 
-    public void setAnswerType(Atype answerType) {
+    public void setAnswerType(Type answerType) {
         this.answerType = answerType;
     }
 
 
 
-    public short getAnswerClass() {
+    public Class getAnswerClass() {
         return answerClass;
     }
 
 
 
-    public void setAnswerClass(short answerClass) {
+    public void setAnswerClass(Class answerClass) {
         this.answerClass = answerClass;
     }
 
@@ -90,41 +96,73 @@ public class Answer implements PacketCompoent<Answer> {
     }
 
 
-
-    // Need a generic type here
-	public enum Atype {
-		HOST_ADDRESS(0x0001), NAME_SERVER(0x0002), MAIL_SERVER(0x000f), CNAME(0x0005);
-		
-		private int code;
-
-		  private Atype(int code) {
-		    this.code = code;
-		  }
-
-		  public int getCode() {
-		    return code;
-		  }
-	}
 	
 	@Override
 	public Answer toBytes(ByteBuffer buf){
 	    domain.toBytes(buf);
 	    // type
 	    buf.putShort((short)answerType.getCode());
-	    buf.putShort((short)answerClass);
+	    buf.putShort((short)answerClass.getCode());
 	    buf.putInt((int)ttl);
 	    
 	    // 16 bit
 	    ByteBuffer recordDataBuffer = ByteBuffer.allocate(65536);
+	    rData.toBytes(recordDataBuffer);
+	    recordDataBuffer.flip();
+	    buf.putShort((short)recordDataBuffer.limit());
+	    buf.put(recordDataBuffer);
 	    
         return this;
 	}
 
 
-
     @Override
     public Answer fromBytes(ByteBuffer buf) {
-        // TODO Auto-generated method stub
-        return null;
+        // sequential read from buffer
+        domain = new Domain().fromBytes(buf);
+        answerType = Type.byCode(buf.getShort());
+        answerClass = Class.byCode(buf.getShort());
+        // 32 bits
+        ttl = buf.getInt() & 0xFFFFFFFF;
+        int rdLength = buf.getShort() & 0xFFFF;
+        
+        switch (answerType) {
+            case CNAME:
+                rData = new CNameRecord();
+                break;
+                
+            case NS:
+                rData = new NSRecord();
+                break;
+            
+            case MX:
+                rData = new MXRecord();
+                break;
+            default:
+                break;
+                
+        }
+        
+        if (answerClass == Class.IN) {
+            switch (answerType) {
+                case A:
+                    rData = new ARecord();
+                    break;
+                default:
+                    break;
+
+            }
+        }
+        
+        if (rData != null) {
+            rData.setRdLength(rdLength);
+            rData.fromBytes(buf);
+        }
+        else {
+            System.out.println("unknonw type:" + answerType);
+            buf.get(new byte[rdLength]);
+        }
+        
+        return this;
     }
 }
