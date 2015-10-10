@@ -34,9 +34,21 @@ public class Domain {
 	
 	// Need Util for this method to convert from string to bytebuffer
 	public Domain toBytes(ByteBuffer buf){
-		for (String string : labels) {
-			buf = ByteBuffer.wrap(string.getBytes());
+		for (String singleLabel : labels) {
+			byte[] label = singleLabel.getBytes();
+			int length = label.length;
+			buf.put((byte) length);
+			buf.put(label);
 		}
+		// Domain name ends with a zero
+		buf.put((byte)0);
+		
+		return this;
+	}
+	
+	public Domain fromBytes(ByteBuffer buf){
+		// clear existing domain
+		labels.clear();
 		
 		return this;
 	}

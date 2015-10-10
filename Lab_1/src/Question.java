@@ -1,3 +1,6 @@
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
 /**
  * Object for DNS Question
  * @author Yang Zhou(260401719)
@@ -46,5 +49,14 @@ public class Question {
 	}
 	
 	
+	public Question toBytes(ByteBuffer buf){
+	    // This is domain
+	    Qname.toBytes(buf);
+	    // 16bits QTYPE 
+	    buf.putShort((short)Qtype.getCode());
+	    buf.putShort(Qclass);
+	    
+	    return this;
+	}
 	
 }

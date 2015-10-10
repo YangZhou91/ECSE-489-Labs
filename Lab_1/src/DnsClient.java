@@ -1,14 +1,18 @@
+import java.nio.ByteBuffer;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+
 public class DnsClient {
+    
+    public static final String DNS_HOST = "132.206.85.18";
 
 	public static void main(String[] args) {
 		
-		System.out.println("Fuck");
 		/**
 		 * Argument Parser
 		 */
@@ -35,7 +39,14 @@ public class DnsClient {
 		}
 		
 		Domain domain = new Domain().fromString("www.mcgill.ca");
-		System.out.println(domain.toString());
+		Domain domain2 = new Domain().fromString("www.google.com");
+		ByteBuffer buf =  ByteBuffer.allocate(1024);
+		
+		domain.toBytes(buf);
+		System.out.println(buf);
+		domain2.toBytes(buf);
+		System.out.println(buf);
+//		System.out.println(domain.toString());
 		
 	}
 }
