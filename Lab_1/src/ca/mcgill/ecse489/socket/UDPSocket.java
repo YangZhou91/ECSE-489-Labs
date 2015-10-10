@@ -1,3 +1,4 @@
+package ca.mcgill.ecse489.socket;
 import java.net.InetAddress;
 
 public class UDPSocket {

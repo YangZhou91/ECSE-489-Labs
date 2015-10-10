@@ -1,9 +1,15 @@
+package ca.mcgill.ecse489.structures;
+
+import java.nio.ByteBuffer;
+
+import ca.mcgill.ecse489.packet.PacketCompoent;
+
 /**
  * 
  * @author Yang Zhou(260401719)
  *
  */
-public class Header {
+public class Header implements PacketCompoent<Header> {
 	
 	// Short is 16-bit signed two's complement integer
 	private short id;
@@ -144,4 +150,14 @@ public class Header {
 			return code;
 		}
 	}
+    @Override
+    public Header toBytes(ByteBuffer buf) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    @Override
+    public Header fromBytes(ByteBuffer buf) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

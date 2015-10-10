@@ -1,3 +1,4 @@
+package ca.mcgill.ecse489.structures;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 

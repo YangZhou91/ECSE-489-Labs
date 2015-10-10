@@ -1,16 +1,21 @@
+package ca.mcgill.ecse489.structures;
 import java.nio.ByteBuffer;
+
+import ca.mcgill.ecse489.packet.PacketCompoent;
+import ca.mcgill.ecse489.record.RData;
 
 /**
  * @author Yan Liu (260152375)
  *
  */
-public class Answer {
+public class Answer implements PacketCompoent<Answer> {
 	private Domain domain;
 	private Atype answerType;
 	private short answerClass;
 	private int ttl;
 	private short rdLength;
-	private byte[] rData;
+	// any type
+	private RData<?> rData;
 	
 	
 	
@@ -74,13 +79,13 @@ public class Answer {
 
 
 
-    public byte[] getrData() {
+    public RData<?> getrData() {
         return rData;
     }
 
 
 
-    public void setrData(byte[] rData) {
+    public void setrData(RData<?> rData) {
         this.rData = rData;
     }
 
@@ -101,6 +106,7 @@ public class Answer {
 		  }
 	}
 	
+	@Override
 	public Answer toBytes(ByteBuffer buf){
 	    domain.toBytes(buf);
 	    // type
@@ -113,4 +119,12 @@ public class Answer {
 	    
         return this;
 	}
+
+
+
+    @Override
+    public Answer fromBytes(ByteBuffer buf) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

@@ -1,3 +1,4 @@
+package ca.mcgill.ecse489.structures;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;

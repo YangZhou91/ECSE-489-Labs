@@ -1,3 +1,4 @@
+package ca.mcgill.ecse489.structures;
 import java.nio.ByteBuffer;
 
 import org.apache.commons.cli.CommandLine;
