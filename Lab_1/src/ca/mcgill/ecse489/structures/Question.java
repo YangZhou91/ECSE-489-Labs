@@ -1,63 +1,86 @@
 package ca.mcgill.ecse489.structures;
-import java.io.IOException;
+
 import java.nio.ByteBuffer;
+
+import ca.mcgill.ecse489.packet.PacketCompoent;
+import ca.mcgill.ecse489.type.Class;
+import ca.mcgill.ecse489.type.Type;
 
 /**
  * Object for DNS Question
+ * 
  * @author Yang Zhou(260401719)
  *
  */
-public class Question {
-	private Domain Qname;
-	private Qtype Qtype;
-	private short Qclass = 0x0001;
-	
-	public Domain getQname() {
-		return Qname;
-	}
+public class Question implements PacketCompoent<Question> {
+    /**
+     * domain name
+     */
+    private Domain Qname;
+    private Type Qtype;
+    private Class Qclass;
 
-	public void setQname(Domain qname) {
-		Qname = qname;
-	}
+    public Domain getQname() {
+        return Qname;
+    }
 
-	public Qtype getQtype() {
-		return Qtype;
-	}
+    public void setQname(Domain qname) {
+        this.Qname = qname;
+    }
 
-	public void setQtype(Qtype qtype) {
-		Qtype = qtype;
-	}
+    public Type getQtype() {
+        return Qtype;
+    }
 
-	public short getQclass() {
-		return Qclass;
-	}
-	public void setQclass(short qclass) {
-		Qclass = qclass;
-	}
+    public void setQtype(Type qtype) {
+        this.Qtype = qtype;
+    }
 
-	public enum Qtype {
-		HOST_ADDRESS(0x0001), NAME_SERVER(0x0002), MAIL_SERVER(0x000f);
-		
-		private int code;
+    public Class getQclass() {
+        return Qclass;
+    }
 
-		  private Qtype(int code) {
-		    this.code = code;
-		  }
+    public void setQclass(Class qclass) {
+        this.Qclass = qclass;
+    }
 
-		  public int getCode() {
-		    return code;
-		  }
-	}
-	
-	
-	public Question toBytes(ByteBuffer buf){
-	    // This is domain
-	    Qname.toBytes(buf);
-	    // 16bits QTYPE 
-	    buf.putShort((short)Qtype.getCode());
-	    buf.putShort(Qclass);
-	    
-	    return this;
-	}
-	
+    public enum Qtype {
+        HOST_ADDRESS(0x0001), NAME_SERVER(0x0002), MAIL_SERVER(0x000f);
+
+        private int code;
+
+        private Qtype(int code) {
+            this.code = code;
+        }
+
+        public int getCode() {
+            return code;
+        }
+    }
+
+    @Override
+    public Question toBytes(ByteBuffer buf) {
+        // This is domain
+        Qname.toBytes(buf);
+        // 16bits QTYPE
+        buf.putShort((short) Qtype.getCode());
+        buf.putShort((short) Qclass.getCode());
+
+        return this;
+    }
+
+    @Override
+    public Question fromBytes(ByteBuffer buf) {
+        Qname = new Domain().toBytes(buf);
+        Qtype = Type.byCode(buf.getShort());
+        Qclass = Class.byCode(buf.getShort());
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return "Question [domain=" + Qname +
+                ", QTYPE = " + Qtype + ", QCLASS =" + Qclass + "]";
+    }
+
 }
