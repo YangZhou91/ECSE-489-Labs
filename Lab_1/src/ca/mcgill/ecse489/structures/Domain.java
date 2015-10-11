@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
+import ca.mcgill.ecse489.packet.PacketCompoent;
+
 
 /**
  * A object for domain name, organized by size and labels
  * @author Yang Zhou(260401719)
  *
  */
-public class Domain {
+public class Domain implements PacketCompoent<Domain> {
 
 	private final Collection<String> labels = new ArrayList<>();
 	
@@ -47,9 +49,30 @@ public class Domain {
 		return this;
 	}
 	
+	@Override
 	public Domain fromBytes(ByteBuffer buf){
 		// clear existing domain
 		labels.clear();
+		// Since the number of label is unknown
+		while (true) {
+            int labelLength = buf.get() & 0xFF;
+            if (labelLength == 0) {
+                break;
+            }
+            
+            if ((labelLength & 0b110_0000) == 0b1100_0000) {
+                int PointerOffset = (labelLength & 0b0011_1111) << 8 | (buf.get() & 0xFF);
+                // pointer
+                Domain pointee = new Domain();
+                // Recursion parsing
+                pointee.fromBytes((ByteBuffer) buf.duplicate().position(PointerOffset));
+                labels.addAll(pointee.labels);
+                break;
+            }
+            byte[] labelBytes = new byte[labelLength];
+            buf.get(labelBytes);
+            labels.add(new String(labelBytes));
+        }
 		
 		return this;
 	}
