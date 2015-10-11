@@ -13,7 +13,7 @@ public class Header implements PacketCompoent<Header> {
 
     // Short is 16-bit signed two's complement integer
     private short id;
-    private Header.QR qr;
+    private boolean qr;
     private Header.OPCODE opcode;
     private boolean aa;
     /**
@@ -43,11 +43,11 @@ public class Header implements PacketCompoent<Header> {
         this.id = id;
     }
 
-    public Header.QR getQr() {
+    public boolean getQr() {
         return qr;
     }
 
-    public void setQr(Header.QR qr) {
+    public void setQr(boolean qr) {
         this.qr = qr;
     }
 
@@ -141,7 +141,7 @@ public class Header implements PacketCompoent<Header> {
 
     public enum QR {
         QUERY(0), RESPONSE(1);
-        private final int code;
+        private int code;
 
         private QR(int code) {
             this.code = code;
@@ -164,7 +164,15 @@ public class Header implements PacketCompoent<Header> {
         public int getCode() {
             return code;
         }
-        // byCode method
+
+        public static Header.OPCODE byCode(int code) {
+            for (Header.OPCODE o : values()) {
+                if (o.code == code) {
+                    return o;
+                }
+            }
+            throw new IllegalArgumentException("No opcode for code " + code + "exists");
+        }
     }
 
     public enum RCODE {
@@ -178,18 +186,48 @@ public class Header implements PacketCompoent<Header> {
         public int getCode() {
             return code;
         }
+
+        public static Header.RCODE byCode(int code) {
+            for (Header.RCODE r : values()) {
+                if (r.code == code) {
+                    return r;
+                }
+            }
+            throw new IllegalArgumentException("No RCODE for code " + code + "exists");
+        }
     }
 
     @Override
     public Header toBytes(ByteBuffer buf) {
-        // TODO Auto-generated method stub
-        return null;
+        buf.putShort(id);
+        short flags = (short) ((qr ? 0 : 1) << 15);
+        flags |= (opcode.getCode() & 0b1111) << 11;
+        flags |= (RD ? 1 : 0) << 8;
+
+        buf.putShort(flags);
+        buf.putShort(qdcount);
+        buf.putShort(ancount);
+        buf.putShort(arcount);
+        return this;
     }
 
     @Override
     public Header fromBytes(ByteBuffer buf) {
-        // TODO Auto-generated method stub
-        return null;
+        id = buf.getShort();
+        int flags = buf.getShort();
+        qr = ((flags >> 15) & 1) == 0;
+        opcode = OPCODE.byCode((flags >> 11) & 0b1111);
+        aa = ((flags >> 10) & 1) == 1;
+        TC = ((flags >> 9) & 1) == 1;
+        RD = ((flags >> 8) & 1) == 1;
+        RA = (flags >> 7 & 1) == 1;
+        rcode = RCODE.byCode(flags & 0b1111);
+
+        qdcount = buf.getShort();
+        ancount = buf.getShort();
+        arcount = buf.getShort();
+
+        return this;
     }
 
     @Override
