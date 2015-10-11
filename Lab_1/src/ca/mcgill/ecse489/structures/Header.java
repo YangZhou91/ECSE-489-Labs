@@ -75,7 +75,7 @@ public class Header implements PacketCompoent<Header> {
         TC = tC;
     }
 
-    public boolean isRD() {
+    public boolean getRD() {
         return RD;
     }
 
@@ -233,7 +233,7 @@ public class Header implements PacketCompoent<Header> {
     @Override
     public String toString() {
         return "Header [id = " + id + ", QR =" + qr + ",opcode =" + opcode +
-                ", AA =" + aa + ",TC =" + TC + ",RD =" + rcode + ",RA =" + RA +
+                ", AA =" + aa + ",TC =" + TC + ",RD =" + RD + ",RA =" + RA +
                 ",Z =" + Z + ",RCODE = " + rcode + ",QDCOUNT = " + qdcount + ",ANCOUNT = "
                 + ancount + ",NSCOUNT = " + nscount + ",ARCOUNT = " + arcount + "]";
     }

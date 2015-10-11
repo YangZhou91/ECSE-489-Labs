@@ -108,7 +108,7 @@ public class DnsClient {
 
         try {
             DnsClient client = new DnsClient(InetAddress.getByName(DNS_HOST));
-            Packet reply = client.request("www.google.ca");
+            Packet reply = client.request("www.mcgill.ca");
             System.err.println("Questions:");
             for (Question q : reply.getQuestions()) {
                 System.err.println(" - " + q);
