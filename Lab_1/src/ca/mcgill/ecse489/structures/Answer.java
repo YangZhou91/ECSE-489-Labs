@@ -1,5 +1,6 @@
 package ca.mcgill.ecse489.structures;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import ca.mcgill.ecse489.packet.PacketCompoent;
@@ -73,12 +74,12 @@ public class Answer implements PacketCompoent<Answer> {
     }
 
     @Override
-    public Answer toBytes(ByteBuffer buf) {
+    public Answer toBytes(ByteBuffer buf) throws IOException {
         domain.toBytes(buf);
         // type
         buf.putShort((short) answerType.getCode());
         buf.putShort((short) answerClass.getCode());
-        buf.putInt((int) ttl);
+        buf.putInt(ttl);
 
         // 16 bit
         ByteBuffer recordDataBuffer = ByteBuffer.allocate(65536);
@@ -91,7 +92,7 @@ public class Answer implements PacketCompoent<Answer> {
     }
 
     @Override
-    public Answer fromBytes(ByteBuffer buf) {
+    public Answer fromBytes(ByteBuffer buf) throws IOException {
         // sequential read from buffer
         domain = new Domain().fromBytes(buf);
         answerType = Type.byCode(buf.getShort());

@@ -1,9 +1,11 @@
 package ca.mcgill.ecse489.packet;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import ca.mcgill.ecse489.record.Record;
 import ca.mcgill.ecse489.structures.Answer;
 import ca.mcgill.ecse489.structures.Header;
 import ca.mcgill.ecse489.structures.Question;
@@ -22,8 +24,8 @@ public class Packet implements PacketCompoent<Packet> {
     private Collection<Question> questions = new ArrayList<>();
     // a number of answers
     private Collection<Answer> answers = new ArrayList<>();
-    private Collection<Answer> authority = new ArrayList<>();
-    private Collection<Answer> additional = new ArrayList<>();
+    private Collection<Record> authority = new ArrayList<>();
+    private Collection<Record> additional = new ArrayList<>();
 
     public Header getHeader() {
         return header;
@@ -49,28 +51,29 @@ public class Packet implements PacketCompoent<Packet> {
         this.answers = answers;
     }
 
-    public Collection<Answer> getAuthority() {
+    public Collection<Record> getAuthority() {
         return authority;
     }
 
-    public void setAuthority(Collection<Answer> authority) {
+    public void setAuthority(Collection<Record> authority) {
         this.authority = authority;
     }
 
-    public Collection<Answer> getAdditional() {
+    public Collection<Record> getAdditional() {
         return additional;
     }
 
-    public void setAdditional(Collection<Answer> additional) {
+    public void setAdditional(Collection<Record> additional) {
         this.additional = additional;
     }
 
     @Override
-    public Packet toBytes(ByteBuffer buf) {
+    public Packet toBytes(ByteBuffer buf) throws IOException {
         header.setQdcount((short) questions.size());
         header.setAncount((short) answers.size());
         // Not used
         header.setArcount((short) additional.size());
+        header.setAdditionalRecords((short) authority.size());
 
         header.toBytes(buf);
         for (Question question : questions) {
@@ -81,13 +84,11 @@ public class Packet implements PacketCompoent<Packet> {
             answer.toBytes(buf);
         }
 
-        // TODO set up authority and additional section if needed.
-
         return this;
     }
 
     @Override
-    public Packet fromBytes(ByteBuffer buf) {
+    public Packet fromBytes(ByteBuffer buf) throws IOException {
         header = new Header();
         header.fromBytes(buf);
 

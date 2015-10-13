@@ -120,5 +120,6 @@ public class DnsClient {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
     }
 }

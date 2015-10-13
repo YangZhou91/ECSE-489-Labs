@@ -1,5 +1,6 @@
 package ca.mcgill.ecse489.structures;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import ca.mcgill.ecse489.packet.PacketCompoent;
@@ -25,15 +26,30 @@ public class Header implements PacketCompoent<Header> {
      */
     private boolean RD;
     private boolean RA;
-    private short Z;
+    /**
+     * Response Code
+     */
     private Header.RCODE rcode;
+    private short Z;
+
     /**
      * Number of of entries in the question section
      */
     private short qdcount;
+    /**
+     * Number of answer entries
+     */
     private short ancount;
-    private short nscount;
+    // private short nscount;
+
+    /**
+     * Number of Additional Entries
+     */
     private short arcount;
+    /**
+     * Number of A
+     */
+    private short authorityRecords;
 
     public short getId() {
         return id;
@@ -59,12 +75,12 @@ public class Header implements PacketCompoent<Header> {
         this.opcode = opcode;
     }
 
-    public boolean isAA() {
+    public boolean isAa() {
         return aa;
     }
 
-    public void setAA(boolean aA) {
-        aa = aA;
+    public void setAa(boolean aa) {
+        this.aa = aa;
     }
 
     public boolean isTC() {
@@ -123,13 +139,13 @@ public class Header implements PacketCompoent<Header> {
         this.ancount = ancount;
     }
 
-    public short getNscount() {
-        return nscount;
-    }
+    // public short getNscount() {
+    // return nscount;
+    // }
 
-    public void setNscount(short nscount) {
-        this.nscount = nscount;
-    }
+    // public void setNscount(short nscount) {
+    // this.nscount = nscount;
+    // }
 
     public short getArcount() {
         return arcount;
@@ -137,6 +153,14 @@ public class Header implements PacketCompoent<Header> {
 
     public void setArcount(short arcount) {
         this.arcount = arcount;
+    }
+
+    public short getAuthorityRecords() {
+        return authorityRecords;
+    }
+
+    public void setAuthorityRecords(short authorityRecords) {
+        this.authorityRecords = authorityRecords;
     }
 
     public enum QR {
@@ -198,7 +222,7 @@ public class Header implements PacketCompoent<Header> {
     }
 
     @Override
-    public Header toBytes(ByteBuffer buf) {
+    public Header toBytes(ByteBuffer buf) throws IOException {
         buf.putShort(id);
         short flags = (short) ((qr ? 0 : 1) << 15);
         flags |= (opcode.getCode() & 0b1111) << 11;
@@ -208,11 +232,12 @@ public class Header implements PacketCompoent<Header> {
         buf.putShort(qdcount);
         buf.putShort(ancount);
         buf.putShort(arcount);
+        buf.putShort(authorityRecords);
         return this;
     }
 
     @Override
-    public Header fromBytes(ByteBuffer buf) {
+    public Header fromBytes(ByteBuffer buf) throws IOException {
         id = buf.getShort();
         int flags = buf.getShort();
         qr = ((flags >> 15) & 1) == 0;
@@ -226,6 +251,7 @@ public class Header implements PacketCompoent<Header> {
         qdcount = buf.getShort();
         ancount = buf.getShort();
         arcount = buf.getShort();
+        authorityRecords = buf.getShort();
 
         return this;
     }
@@ -235,6 +261,6 @@ public class Header implements PacketCompoent<Header> {
         return "Header [id = " + id + ", QR =" + qr + ",opcode =" + opcode +
                 ", AA =" + aa + ",TC =" + TC + ",RD =" + RD + ",RA =" + RA +
                 ",Z =" + Z + ",RCODE = " + rcode + ",QDCOUNT = " + qdcount + ",ANCOUNT = "
-                + ancount + ",NSCOUNT = " + nscount + ",ARCOUNT = " + arcount + "]";
+                + ancount + ",ARCOUNT = " + arcount + "]";
     }
 }

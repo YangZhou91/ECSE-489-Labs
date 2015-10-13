@@ -1,4 +1,5 @@
 package ca.mcgill.ecse489.socket;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -12,54 +13,69 @@ public class UDPSocket {
     // default port
     public static final int PORT = 53;
     public static final int MAX_PACKET_SIZE = 512;
-    
+
     private final InetAddress server;
     private final int port;
-    
-    public UDPSocket(InetAddress server){
+
+    public UDPSocket(InetAddress server) {
         this(server, PORT);
     }
 
     public UDPSocket(InetAddress server, int port) {
-        this.server = server; 
+        this.server = server;
         this.port = port;
     }
-    
-    public Packet sendQuery(Packet dnsPacket){
-        byte[] packetBytes = serializeMessage(dnsPacket, MAX_PACKET_SIZE);
-        
-        DatagramPacket requestPacket = new DatagramPacket(packetBytes, packetBytes.length, server, PORT);
-        
-        try {
+
+    public Packet sendQuery(Packet dnsPacket) {
+        // byte[] packetBytes = serializeMessage(dnsPacket, MAX_PACKET_SIZE);
+        byte[] packetBytes = { 43, -5, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 119, 119, 119, 6, 109, 99, 103, 105, 108,
+            108,
+            2, 99, 97, 0, 0, -1, 0, 1 };
+
+        DatagramPacket requestPacket = new DatagramPacket(packetBytes, packetBytes.length, server, port);
+
+        try
+
+        {
             DatagramSocket socket = new DatagramSocket();
             socket.send(requestPacket);
-            
+
             byte[] buf = new byte[1024];
             DatagramPacket responsePacket = new DatagramPacket(buf, buf.length);
             socket.receive(responsePacket);
-            
+
             byte[] responseBytes = new byte[responsePacket.getLength()];
-            System.arraycopy(responsePacket.getData(), responsePacket.getOffset(), responseBytes, 0, responsePacket.getLength());
+            System.arraycopy(responsePacket.getData(), responsePacket.getOffset(), responseBytes, 0,
+                    responsePacket.getLength());
 
             ByteBuffer byteBuffer = ByteBuffer.wrap(responseBytes);
             Packet responseMessage = new Packet().fromBytes(byteBuffer);
 
             return responseMessage;
-        } catch (SocketException e) {
+        } catch (
+
+        SocketException e)
+
+        {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } catch (IOException e) {
+        } catch (
+
+        IOException e)
+
+        {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return null;  
+        return null;
+
     }
-    
-    static byte[] serializeMessage(Packet packet, int maxPacketSize){
+
+    static byte[] serializeMessage(Packet packet, int maxPacketSize) throws IOException {
         ByteBuffer requestBuffer = ByteBuffer.allocate(maxPacketSize);
         packet.toBytes(requestBuffer);
         requestBuffer.flip();
-        
+
         byte[] packetBytes = new byte[requestBuffer.limit()];
         requestBuffer.get(packetBytes);
         return packetBytes;
