@@ -5,18 +5,17 @@ import java.nio.ByteBuffer;
 import ca.mcgill.ecse489.structures.Domain;
 
 public class CNameRecord extends RData<CNameRecord> {
-    
+
     private final Domain domain;
-    
+
     public CNameRecord() {
         this(new Domain());
     }
-    
-    public CNameRecord(Domain domain){
+
+    public CNameRecord(Domain domain) {
         this.domain = domain;
     }
 
-    
     public Domain getDomain() {
         return domain;
     }
@@ -33,4 +32,8 @@ public class CNameRecord extends RData<CNameRecord> {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return "[CName=" + domain + "]";
+    }
 }
