@@ -261,6 +261,6 @@ public class Header implements PacketCompoent<Header> {
         return "Header [id = " + id + ", QR =" + qr + ",opcode =" + opcode +
                 ", AA =" + aa + ",TC =" + TC + ",RD =" + RD + ",RA =" + RA +
                 ",Z =" + Z + ",RCODE = " + rcode + ",QDCOUNT = " + qdcount + ",ANCOUNT = "
-                + ancount + ",ARCOUNT = " + arcount + "]";
+                + ancount + ",ARCOUNT = " + arcount + ",AuthorityRecord" + authorityRecords + "]";
     }
 }

@@ -1,5 +1,6 @@
 package ca.mcgill.ecse489.dns;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Random;
@@ -33,20 +34,20 @@ public class DnsClient {
         this.dnsServer = dnsServer;
     }
 
-    public Packet request(String domain) {
+    public Packet request(String domain) throws IOException {
         return this.request(domain, Type.A);
     }
 
-    public Packet request(String domain, Type qtype) {
+    public Packet request(String domain, Type qtype) throws IOException {
         return this.request(domain, qtype, Class.IN);
     }
 
-    public Packet request(String domain, Type qtype, Class qclass) {
+    public Packet request(String domain, Type qtype, Class qclass) throws IOException {
         Packet requestPacket = createPacket(domain, qclass, qtype);
         return getRepley(requestPacket);
     }
 
-    public Packet getRepley(Packet requestPacket) {
+    public Packet getRepley(Packet requestPacket) throws IOException {
         if (requestPacket.getHeader().getId() == 0) {
             requestPacket.getHeader().setId((short) RANDOM.nextInt(1 << 15));
         }
@@ -55,7 +56,7 @@ public class DnsClient {
         return getRepley(requestPacket, socket);
     }
 
-    public Packet getRepley(Packet requestPacket, UDPSocket socket) {
+    public Packet getRepley(Packet requestPacket, UDPSocket socket) throws IOException {
         return socket.sendQuery(requestPacket);
     }
 
@@ -80,7 +81,7 @@ public class DnsClient {
         return requestPacket;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         /**
          * Argument Parser

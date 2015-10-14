@@ -71,7 +71,7 @@ public class Question implements PacketCompoent<Question> {
 
     @Override
     public Question fromBytes(ByteBuffer buf) {
-        Qname = new Domain().toBytes(buf);
+        Qname = new Domain().fromBytes(buf);
         Qtype = Type.byCode(buf.getShort());
         Qclass = Class.byCode(buf.getShort());
         return this;

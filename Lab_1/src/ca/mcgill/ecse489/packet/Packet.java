@@ -71,9 +71,9 @@ public class Packet implements PacketCompoent<Packet> {
     public Packet toBytes(ByteBuffer buf) throws IOException {
         header.setQdcount((short) questions.size());
         header.setAncount((short) answers.size());
-        // Not used
+        // Set Additional Count
         header.setArcount((short) additional.size());
-        header.setAdditionalRecords((short) authority.size());
+        header.setAuthorityRecords((short) authority.size());
 
         header.toBytes(buf);
         for (Question question : questions) {

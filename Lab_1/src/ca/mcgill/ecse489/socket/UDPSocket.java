@@ -26,11 +26,8 @@ public class UDPSocket {
         this.port = port;
     }
 
-    public Packet sendQuery(Packet dnsPacket) {
-        // byte[] packetBytes = serializeMessage(dnsPacket, MAX_PACKET_SIZE);
-        byte[] packetBytes = { 43, -5, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 3, 119, 119, 119, 6, 109, 99, 103, 105, 108,
-            108,
-            2, 99, 97, 0, 0, -1, 0, 1 };
+    public Packet sendQuery(Packet dnsPacket) throws IOException {
+        byte[] packetBytes = serializeMessage(dnsPacket, MAX_PACKET_SIZE);
 
         DatagramPacket requestPacket = new DatagramPacket(packetBytes, packetBytes.length, server, port);
 
