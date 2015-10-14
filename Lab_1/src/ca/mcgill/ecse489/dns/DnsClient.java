@@ -8,6 +8,7 @@ import java.util.Random;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -23,8 +24,8 @@ import ca.mcgill.ecse489.type.Type;
 public class DnsClient {
 
     public static final Random RANDOM = new Random();
-    public static final String DNS_HOST = "132.206.85.18";
-    // public static final String DNS_HOST = "8.8.8.8";
+    public static String DNS_HOST;
+    public static String DOMAIN;
     int TIMEOUT;
     int MAXRETIRES;
     int PORT;
@@ -90,9 +91,10 @@ public class DnsClient {
         Options options = new Options();
 
         // add t option, false indicates optional
-        options.addOption("t", false, "timeout");
-        options.addOption("r", false, "max-retries");
-        options.addOption("p", false, "port");
+
+        options.addOption(Option.builder("t").argName("timeout").hasArg(true).desc("").build());
+        options.addOption(Option.builder("r").argName("number of retries").hasArg(true).build());
+        options.addOption(Option.builder("p").argName("port num").hasArg().build());
         options.addOption("mx", false, "Mail server");
         options.addOption("ns", false, "Name server");
 
@@ -101,7 +103,32 @@ public class DnsClient {
             CommandLine cmd = parser.parse(options, args);
             if (cmd.hasOption("t")) {
                 // System.out.print("timeout");
+                String timeout = cmd.getOptionValue("t");
+                System.out.println("[Timeout] = " + timeout);
             }
+
+            if (cmd.hasOption("r")) {
+                System.out.println("[Maxretries]= " + cmd.getOptionValue("r"));
+            }
+
+            if (cmd.hasOption("p")) {
+                System.out.println("[Port num] =" + cmd.getOptionValue("p"));
+            }
+
+            if (cmd.hasOption("mx")) {
+                System.out.println("It has option mx");
+            }
+
+            if (cmd.hasOption("ns")) {
+                System.out.println("It has option ns");
+            }
+
+            DNS_HOST = cmd.getArgList().get(0).replace("@", "");
+            DOMAIN = cmd.getArgList().get(1);
+
+            System.out.println(DOMAIN);
+            System.out.println(DNS_HOST);
+
         } catch (ParseException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
