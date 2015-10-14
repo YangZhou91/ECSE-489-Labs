@@ -69,7 +69,7 @@ public class Domain implements PacketCompoent<Domain> {
                 break;
             }
 
-            if ((labelLength & 0b110_0000) == 0b1100_0000) {
+            if ((labelLength & 0b1100_0000) == 0b1100_0000) {
                 int PointerOffset = (labelLength & 0b0011_1111) << 8 | (buf.get() & 0xFF);
                 // pointer
                 Domain pointee = new Domain();
