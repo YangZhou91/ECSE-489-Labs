@@ -6,19 +6,18 @@ import java.nio.ByteBuffer;
 
 /**
  * A (IP address) record
+ * 
  * @author Yang Zhou
  *
  */
 public class ARecord extends RData<ARecord> {
-    
+
     private InetAddress ipAddress;
-    
+
     public ARecord() {
         // TODO Auto-generated constructor stub
     };
 
-    
-    
     public InetAddress getIpAddress() {
         return ipAddress;
     }
@@ -27,13 +26,11 @@ public class ARecord extends RData<ARecord> {
         this.ipAddress = ipAddress;
     }
 
-
-
     @Override
     public RData<ARecord> toBytes(ByteBuffer buf) {
         // TODO check if getAddress is allowed
         buf.put(ipAddress.getAddress());
-        
+
         return this;
     }
 
@@ -46,8 +43,12 @@ public class ARecord extends RData<ARecord> {
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }        
+        }
         return this;
     }
 
+    @Override
+    public String toString() {
+        return "A [address=" + ipAddress + "]";
+    }
 }
