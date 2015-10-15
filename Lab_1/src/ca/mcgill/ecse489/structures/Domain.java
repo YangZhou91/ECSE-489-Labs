@@ -58,6 +58,17 @@ public class Domain implements PacketCompoent<Domain> {
         return this;
     }
 
+    public String getDomain() {
+        StringBuilder builder = new StringBuilder();
+        for (String label : labels) {
+            if (builder.length() > 0) {
+                builder.append(".");
+            }
+            builder.append(label);
+        }
+        return builder.toString();
+    }
+
     @Override
     public Domain fromBytes(ByteBuffer buf) {
         // clear existing domain
@@ -88,6 +99,6 @@ public class Domain implements PacketCompoent<Domain> {
 
     @Override
     public String toString() {
-        return "Domain [labels" + labels + "]";
+        return labels.toString();
     }
 }

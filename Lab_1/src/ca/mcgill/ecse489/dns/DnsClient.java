@@ -13,6 +13,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 import ca.mcgill.ecse489.packet.Packet;
+import ca.mcgill.ecse489.record.Record;
 import ca.mcgill.ecse489.socket.UDPSocket;
 import ca.mcgill.ecse489.structures.Answer;
 import ca.mcgill.ecse489.structures.Domain;
@@ -20,25 +21,50 @@ import ca.mcgill.ecse489.structures.Header;
 import ca.mcgill.ecse489.structures.Question;
 import ca.mcgill.ecse489.type.Class;
 import ca.mcgill.ecse489.type.Type;
+import ca.mcgill.ecse489.util.Util;
 
 public class DnsClient {
 
+    // This is probably in milliseconds
+    public static final int DEFAULT_TIMEOUT = 5;
+    public static final int DEFAULT_MAX_RETREIES = 3;
+    public static final int DEFAULT_PORT = 53;
+
     public static final Random RANDOM = new Random();
-    public static String DNS_HOST;
-    public static String DOMAIN;
-    int TIMEOUT;
-    int MAXRETIRES;
-    int PORT;
+    public static String dnsHost;
+    public static String domain;
+    public static int timeout = DEFAULT_TIMEOUT;
+    public static int maxRetries = DEFAULT_MAX_RETREIES;
+    public static int port = DEFAULT_PORT;
+    public static Type type = Type.A;
     InetAddress dnsServer;
 
     public DnsClient(InetAddress dnsServer) {
+        this(dnsServer, DEFAULT_TIMEOUT);
+    }
+
+    public DnsClient(InetAddress dnsServer, int timeout) {
+
+        this(dnsServer, timeout, DEFAULT_MAX_RETREIES);
+    }
+
+    public DnsClient(InetAddress dnsServer, int timeout, int maxRetries) {
+
+        this(dnsServer, timeout, maxRetries, DEFAULT_PORT);
+    }
+
+    public DnsClient(InetAddress dnsServer, int timeout, int maxRetries, int port) {
         this.dnsServer = dnsServer;
+        DnsClient.timeout = timeout;
+        DnsClient.maxRetries = maxRetries;
+        DnsClient.port = port;
     }
 
     public Packet request(String domain) throws IOException {
         return this.request(domain, Type.A);
     }
 
+    // TODO use this method instead of first one
     public Packet request(String domain, Type qtype) throws IOException {
         return this.request(domain, qtype, Class.IN);
     }
@@ -53,7 +79,7 @@ public class DnsClient {
             requestPacket.getHeader().setId((short) RANDOM.nextInt(1 << 15));
         }
 
-        UDPSocket socket = new UDPSocket(dnsServer);
+        UDPSocket socket = new UDPSocket(dnsServer, port);
         return getRepley(requestPacket, socket);
     }
 
@@ -102,32 +128,37 @@ public class DnsClient {
         try {
             CommandLine cmd = parser.parse(options, args);
             if (cmd.hasOption("t")) {
-                // System.out.print("timeout");
-                String timeout = cmd.getOptionValue("t");
-                System.out.println("[Timeout] = " + timeout);
+                timeout = Integer.parseInt(cmd.getOptionValue("t"));
+
             }
 
             if (cmd.hasOption("r")) {
-                System.out.println("[Maxretries]= " + cmd.getOptionValue("r"));
+                maxRetries = Integer.parseInt(cmd.getOptionValue("r"));
             }
 
             if (cmd.hasOption("p")) {
-                System.out.println("[Port num] =" + cmd.getOptionValue("p"));
+                port = Integer.parseInt(cmd.getOptionValue("p"));
             }
 
             if (cmd.hasOption("mx")) {
-                System.out.println("It has option mx");
+                type = Type.MX;
             }
 
             if (cmd.hasOption("ns")) {
-                System.out.println("It has option ns");
+                type = Type.NS;
             }
 
-            DNS_HOST = cmd.getArgList().get(0).replace("@", "");
-            DOMAIN = cmd.getArgList().get(1);
+            try {
+                if (cmd.getArgList().get(0).contains("@")) {
+                    dnsHost = cmd.getArgList().get(0).replace("@", "");
+                } else if (!cmd.getArgList().get(0).contains("@")) {
+                    System.err.println("ERROR" + "\t" + "[Please specify the DNS with @ at beginning]");
+                }
 
-            System.out.println(DOMAIN);
-            System.out.println(DNS_HOST);
+                domain = cmd.getArgList().get(1);
+            } catch (java.lang.IndexOutOfBoundsException e) {
+                System.err.println("ERROR" + "\t" + "[Please specify both the domain or DNS server]");
+            }
 
         } catch (ParseException e) {
             // TODO Auto-generated catch block
@@ -135,18 +166,67 @@ public class DnsClient {
         }
 
         try {
-            DnsClient client = new DnsClient(InetAddress.getByName(DNS_HOST));
-            Packet reply = client.request("www.facebookt.com");
-            System.err.println("Questions:");
+            InetAddress dnsServer = InetAddress.getByAddress(Util.getIpAddress(dnsHost));
+            DnsClient client = new DnsClient(dnsServer, timeout, maxRetries, port);
+
+            /**
+             * Request output
+             */
+            System.out.println("DnsClient sending request for [" + domain + "]");
+            System.out.println("Server: [" + dnsHost + "]");
+            System.out.println("Request type: [" + type + "]");
+
+            Packet reply = client.request(domain);
+
+            System.out.println("***Answer Section ([" + reply.getHeader().getAncount() + "]records) ****");
             for (Question q : reply.getQuestions()) {
-                System.err.println(" - " + q);
             }
             for (Answer a : reply.getAnswers()) {
-                System.err.println(" - " + a);
+                Type type = a.getAnswerType();
+                String typeSection = new String();
+                String isAuth = (reply.getHeader().isAa() ? "auth" : "nonauth");
+                switch (type) {
+                    case A:
+                        typeSection = String.format("%s \t [%s]", "IP", a.getrData());
+
+                        break;
+
+                    case CNAME:
+                        typeSection = String.format("%s \t [%s]", "CNAME", a.getrData());
+                        break;
+
+                    case MX:
+                        typeSection = String.format("%s \t [%s]", "MX", a.getrData());
+                        break;
+
+                    case NS:
+                        typeSection = String.format("%s \t [%s]", "NS", a.getrData());
+                        break;
+
+                    default:
+                        break;
+
+                }
+
+                System.out.println(
+                        typeSection + "\t" + "[" + a.getTtl() + " seconds can cache" + "]"
+                                + "\t" + "[" + isAuth + "]");
+                if (reply.getHeader().getArcount() > 0) {
+                    System.out.println("***Additional Section ([" + reply.getHeader().getArcount() + "])***");
+                } else {
+                    // System.out.println("NOFOUND");
+                }
+                for (Record additional : reply.getAdditionals()) {
+
+                }
+
             }
+
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        } catch (NullPointerException e) {
+            System.err.println("ERROE" + "\t" + "[Please specify the domain or dns]");
         }
 
     }

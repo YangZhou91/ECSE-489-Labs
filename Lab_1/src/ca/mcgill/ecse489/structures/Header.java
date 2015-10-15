@@ -131,6 +131,11 @@ public class Header implements PacketCompoent<Header> {
         this.qdcount = qdcount;
     }
 
+    /**
+     * Getter for number of answers
+     * 
+     * @return Answer count
+     */
     public short getAncount() {
         return ancount;
     }
@@ -147,6 +152,11 @@ public class Header implements PacketCompoent<Header> {
     // this.nscount = nscount;
     // }
 
+    /**
+     * Getter for additional count
+     * 
+     * @return Additional counter
+     */
     public short getArcount() {
         return arcount;
     }

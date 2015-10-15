@@ -34,6 +34,6 @@ public class CNameRecord extends RData<CNameRecord> {
 
     @Override
     public String toString() {
-        return "[CName=" + domain + "]";
+        return domain.getDomain();
     }
 }

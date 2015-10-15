@@ -25,12 +25,20 @@ public class Answer implements PacketCompoent<Answer> {
     // any type
     private RData<?> rData;
 
-    public Domain getAnswerName() {
+    public Domain getDomain() {
         return domain;
     }
 
-    public void setAnswerName(Domain answerName) {
-        this.domain = answerName;
+    public void setDomain(Domain domain) {
+        this.domain = domain;
+    }
+
+    public int getTtl() {
+        return ttl;
+    }
+
+    public void setTtl(int ttl) {
+        this.ttl = ttl;
     }
 
     public Type getAnswerType() {
@@ -47,14 +55,6 @@ public class Answer implements PacketCompoent<Answer> {
 
     public void setAnswerClass(Class answerClass) {
         this.answerClass = answerClass;
-    }
-
-    public int getAnswerTTL() {
-        return ttl;
-    }
-
-    public void setAnswerTTL(int answerTTL) {
-        this.ttl = answerTTL;
     }
 
     public short getRdLength() {

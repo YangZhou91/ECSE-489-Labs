@@ -49,6 +49,6 @@ public class ARecord extends RData<ARecord> {
 
     @Override
     public String toString() {
-        return "A [address=" + ipAddress + "]";
+        return ipAddress.toString();
     }
 }

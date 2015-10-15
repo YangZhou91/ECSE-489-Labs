@@ -25,7 +25,7 @@ public class Packet implements PacketCompoent<Packet> {
     // a number of answers
     private Collection<Answer> answers = new ArrayList<>();
     private Collection<Record> authority = new ArrayList<>();
-    private Collection<Record> additional = new ArrayList<>();
+    private Collection<Record> additionals = new ArrayList<>();
 
     public Header getHeader() {
         return header;
@@ -59,12 +59,12 @@ public class Packet implements PacketCompoent<Packet> {
         this.authority = authority;
     }
 
-    public Collection<Record> getAdditional() {
-        return additional;
+    public Collection<Record> getAdditionals() {
+        return additionals;
     }
 
-    public void setAdditional(Collection<Record> additional) {
-        this.additional = additional;
+    public void setAdditionals(Collection<Record> additionals) {
+        this.additionals = additionals;
     }
 
     @Override
@@ -72,7 +72,7 @@ public class Packet implements PacketCompoent<Packet> {
         header.setQdcount((short) questions.size());
         header.setAncount((short) answers.size());
         // Set Additional Count
-        header.setArcount((short) additional.size());
+        header.setArcount((short) additionals.size());
         header.setAuthorityRecords((short) authority.size());
 
         header.toBytes(buf);
