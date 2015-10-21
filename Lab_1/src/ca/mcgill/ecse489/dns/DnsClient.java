@@ -64,7 +64,6 @@ public class DnsClient {
         return this.request(domain, Type.A);
     }
 
-    // TODO use this method instead of first one
     public Packet request(String domain, Type qtype) throws IOException {
         return this.request(domain, qtype, Class.IN);
     }
@@ -79,7 +78,7 @@ public class DnsClient {
             requestPacket.getHeader().setId((short) RANDOM.nextInt(1 << 15));
         }
 
-        UDPSocket socket = new UDPSocket(dnsServer, port);
+        UDPSocket socket = new UDPSocket(dnsServer, port, timeout, maxRetries);
         return getRepley(requestPacket, socket);
     }
 
@@ -165,6 +164,9 @@ public class DnsClient {
             e.printStackTrace();
         }
 
+        /**
+         * Create dns client
+         */
         try {
             InetAddress dnsServer = InetAddress.getByAddress(Util.getIpAddress(dnsHost));
             DnsClient client = new DnsClient(dnsServer, timeout, maxRetries, port);
@@ -176,7 +178,8 @@ public class DnsClient {
             System.out.println("Server: [" + dnsHost + "]");
             System.out.println("Request type: [" + type + "]");
 
-            Packet reply = client.request(domain);
+            // Defined type and the class is default
+            Packet reply = client.request(domain, type);
 
             System.out.println("***Answer Section ([" + reply.getHeader().getAncount() + "]records) ****");
             for (Question q : reply.getQuestions()) {
@@ -211,15 +214,44 @@ public class DnsClient {
                 System.out.println(
                         typeSection + "\t" + "[" + a.getTtl() + " seconds can cache" + "]"
                                 + "\t" + "[" + isAuth + "]");
-                if (reply.getHeader().getArcount() > 0) {
-                    System.out.println("***Additional Section ([" + reply.getHeader().getArcount() + "])***");
-                } else {
-                    // System.out.println("NOFOUND");
-                }
-                for (Record additional : reply.getAdditionals()) {
 
+            }
+
+            if (reply.getHeader().getArcount() > 0) {
+                System.out.println("***Additional Section ([" + reply.getHeader().getArcount() + "])***");
+            } else {
+                // System.out.println("NOFOUND");
+            }
+
+            for (Record additional : reply.getAdditionals()) {
+                Type type = additional.getRecordType();
+                String typeSection = new String();
+                String isAuth = (reply.getHeader().isAa() ? "auth" : "nonauth");
+                switch (type) {
+                    case A:
+                        typeSection = String.format("%s \t [%s]", "IP", additional.getRecordData());
+
+                        break;
+
+                    case CNAME:
+                        typeSection = String.format("%s \t [%s]", "CNAME", additional.getRecordData());
+                        break;
+
+                    case MX:
+                        typeSection = String.format("%s \t [%s]", "MX", additional.getRecordData());
+                        break;
+
+                    case NS:
+                        typeSection = String.format("%s \t [%s]", "NS", additional.getRecordData());
+                        break;
+
+                    default:
+                        break;
                 }
 
+                System.out.println(
+                        typeSection + "\t" + "[" + additional.getTtl() + " seconds can cache" + "]"
+                                + "\t" + "[" + isAuth + "]");
             }
 
         } catch (UnknownHostException e) {

@@ -75,12 +75,15 @@ public class Domain implements PacketCompoent<Domain> {
         labels.clear();
         // Since the number of label is unknown
         while (true) {
+            // 255 octects
             int labelLength = buf.get() & 0xFF;
             if (labelLength == 0) {
                 break;
             }
 
+            // Detect the start of the pointer 11
             if ((labelLength & 0b1100_0000) == 0b1100_0000) {
+                // figure offset out
                 int PointerOffset = (labelLength & 0b0011_1111) << 8 | (buf.get() & 0xFF);
                 // pointer
                 Domain pointee = new Domain();
@@ -89,6 +92,7 @@ public class Domain implements PacketCompoent<Domain> {
                 labels.addAll(pointee.labels);
                 break;
             }
+
             byte[] labelBytes = new byte[labelLength];
             buf.get(labelBytes);
             labels.add(new String(labelBytes));

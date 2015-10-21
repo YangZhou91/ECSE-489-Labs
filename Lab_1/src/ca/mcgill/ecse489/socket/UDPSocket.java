@@ -7,7 +7,6 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
-import java.util.concurrent.TimeUnit;
 
 import ca.mcgill.ecse489.packet.Packet;
 
@@ -66,7 +65,8 @@ public class UDPSocket {
                 continueSending = false;
                 long responseTime = System.currentTimeMillis() - startTime;
                 System.out.println("Response received after "
-                        + "[" + String.format("%d", TimeUnit.MILLISECONDS.toSeconds(responseTime)) + "]" + " seconds "
+                        + "[" + String.format("%f", responseTime / 1000.0) + "]"
+                        + " seconds "
                         + "([" + i + "] retries)");
 
                 byte[] responseBytes = new byte[responsePacket.getLength()];

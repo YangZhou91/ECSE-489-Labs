@@ -84,6 +84,14 @@ public class Packet implements PacketCompoent<Packet> {
             answer.toBytes(buf);
         }
 
+        for (Record r : authority) {
+            r.toBytes(buf);
+        }
+
+        for (Record r : additionals) {
+            r.toBytes(buf);
+        }
+
         return this;
     }
 
@@ -94,6 +102,7 @@ public class Packet implements PacketCompoent<Packet> {
 
         questions.clear();
         answers.clear();
+        authority.clear();
 
         for (int i = 0; i < header.getQdcount(); i++) {
             questions.add(new Question().fromBytes(buf));
@@ -103,7 +112,13 @@ public class Packet implements PacketCompoent<Packet> {
             answers.add(new Answer().fromBytes(buf));
         }
 
-        // TODO add Authority and Additional Section if needed
+        for (int i = 0; i < header.getAuthorityRecords(); i++) {
+            authority.add(new Record().fromBytes(buf));
+        }
+
+        for (int i = 0; i < header.getArcount(); i++) {
+            additionals.add(new Record().fromBytes(buf));
+        }
 
         return this;
     }

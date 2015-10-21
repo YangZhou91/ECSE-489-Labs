@@ -44,20 +44,6 @@ public class Question implements PacketCompoent<Question> {
         this.Qclass = qclass;
     }
 
-    public enum Qtype {
-        HOST_ADDRESS(0x0001), NAME_SERVER(0x0002), MAIL_SERVER(0x000f);
-
-        private int code;
-
-        private Qtype(int code) {
-            this.code = code;
-        }
-
-        public int getCode() {
-            return code;
-        }
-    }
-
     @Override
     public Question toBytes(ByteBuffer buf) {
         // This is domain
