@@ -10,9 +10,9 @@ import ca.mcgill.ecse489.structures.Domain;
  *
  */
 public class NSRecord extends RData<NSRecord> {
-    
+
     private final Domain domain;
-    
+
     public NSRecord() {
         this(new Domain());
     }
@@ -33,4 +33,8 @@ public class NSRecord extends RData<NSRecord> {
         return null;
     }
 
+    @Override
+    public String toString() {
+        return domain.getDomain();
+    }
 }

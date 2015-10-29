@@ -219,8 +219,10 @@ public class DnsClient {
 
             if (reply.getHeader().getArcount() > 0) {
                 System.out.println("***Additional Section ([" + reply.getHeader().getArcount() + "])***");
+            } else if (reply.getHeader().getRcode() == Header.RCODE.NAME_ERROR) {
+                System.out.println("Name Error");
             } else {
-                // System.out.println("NOFOUND");
+                System.out.println("NOFOUND");
             }
 
             for (Record additional : reply.getAdditionals()) {
