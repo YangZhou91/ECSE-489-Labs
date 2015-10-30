@@ -104,6 +104,7 @@ public class UDPSocket {
             System.err.println("ERROR" + "\t" + "Maximum number of retries "
                     + "[" + max_retries + "] exceeded");
         }
+        socket.close();
         return null;
 
     }

@@ -222,7 +222,7 @@ public class DnsClient {
             } else if (reply.getHeader().getRcode() == Header.RCODE.NAME_ERROR) {
                 System.out.println("Name Error");
             } else {
-                System.out.println("NOFOUND");
+                // System.out.println("NOFOUND");
             }
 
             for (Record additional : reply.getAdditionals()) {
@@ -260,7 +260,7 @@ public class DnsClient {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (NullPointerException e) {
-            System.err.println("ERROE" + "\t" + "[Please specify the domain or dns]");
+            e.printStackTrace();
         }
 
     }
